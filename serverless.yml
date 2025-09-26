@@ -1,14 +1,28 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
 org: ludde
-# "service" is the name of this project. This will also be added to your AWS resource names.
+
 service: quiztopia-api
 
 provider:
   name: aws
   runtime: nodejs20.x
-  # Uncomment to easily set up a custom domain. Read the docs for more details:
-  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
-  # domain: api.example.com
+  region: eu-north-1
+
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
+      Resource:
+        - arn:aws:dynamodb:${self:provider.region}:*:table/quiztopia
+
+
+
 
 functions:
   hello:
@@ -17,3 +31,17 @@ functions:
       - httpApi:
           path: /
           method: get
+
+  register: 
+    handler: functions/Register/index.handler
+    events:
+      - httpApi:
+          path: /register
+          method: post
+  
+  login:
+    handler: functions/Login/index.handler
+    events:
+      - httpApi:
+         path: /login
+         method: post

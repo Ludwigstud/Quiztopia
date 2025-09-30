@@ -6,42 +6,90 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: eu-north-1
-
-
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-        - dynamodb:BatchWriteItem
-      Resource:
-        - arn:aws:dynamodb:${self:provider.region}:*:table/quiztopia
+  environment:
+    DYNAMODB_TABLE: "quiztopia"
+    JWT_SECRET: "secretKey" 
 
 
 
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "dynamodb:PutItem"
+            - "dynamodb:GetItem"
+            - "dynamodb:Query"
+            - "dynamodb:DeleteItem"
+          Resource:
+            - "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/quiztopia"
+            - "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/quiztopia/index/AllQuizzesIndex"
 
 functions:
-  hello:
-    handler: handler.hello
+  # --- User Management Functions ---
+  registerUser:
+    handler: functions/RegisterUser/index.handler
     events:
       - httpApi:
-          path: /
+          path: /users/register
+          method: post
+
+  loginUser:
+    handler: functions/LoginUser/index.handler
+    events:
+      - httpApi:
+          path: /users/login
+          method: post
+
+  # --- Public Quiz Functions ---
+  getAllQuizzes:
+    handler: functions/GetAllQuizzes/index.handler
+    events:
+      - httpApi:
+          path: /quizzes
           method: get
 
-  register: 
-    handler: functions/Register/index.handler
+  getQuizDetails:
+    handler: functions/GetQuizDetails/index.handler
     events:
       - httpApi:
-          path: /register
+          path: /quizzes/{quizId}
+          method: get
+
+  # --- Authenticated Quiz/Question Functions ---
+  createQuiz:
+    handler: functions/CreateQuiz/index.handler
+    events:
+      - httpApi:
+          path: /quizzes
           method: post
-  
-  login:
-    handler: functions/Login/index.handler
+
+  deleteQuiz:
+    handler: functions/DeleteQuiz/index.handler
     events:
       - httpApi:
-         path: /login
-         method: post
+          path: /quizzes/{quizId}
+          method: delete
+
+  addQuestion:
+    handler: functions/AddQuestion/index.handler
+    events:
+      - httpApi:
+          path: /quizzes/{quizId}/questions
+          method: post
+
+  # --- VG: Leaderboard Functions ---
+  registerScore:
+    handler: functions/RegisterScore/index.handler
+    events:
+      - httpApi:
+          path: /quizzes/{quizId}/scores
+          method: post
+
+  getLeaderboard:
+    handler: functions/GetLeaderboard/index.handler
+    events:
+      - httpApi:
+          path: /quizzes/{quizId}/leaderboard
+          method: get
+

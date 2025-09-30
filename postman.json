@@ -1,0 +1,251 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-4a3b-8c7d-1e2f3a4b5c6d",
+		"name": "Quiztopia API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. User Management",
+			"item": [
+				{
+					"name": "Register New User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"postman_user\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "register"]
+						},
+						"description": "Creates a new user account."
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// This script runs AFTER the request is complete.",
+									"// It parses the JSON response and saves the token to a collection variable.",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set(\"authToken\", jsonData.token);",
+									"    console.log(\"Auth Token saved!\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"postman_user\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "login"]
+						},
+						"description": "Logs in a user and automatically saves the returned JWT to the `authToken` variable for use in other requests."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Quizzes",
+			"item": [
+				{
+					"name": "Get All Quizzes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/quizzes",
+							"host": ["{{baseUrl}}"],
+							"path": ["quizzes"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Quiz",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// This script runs AFTER the request is complete.",
+									"// It parses the JSON response and saves the new quizId to a collection variable.",
+									"var jsonData = pm.response.json();",
+									"if (jsonData.quizId) {",
+									"    pm.collectionVariables.set(\"quizId\", jsonData.quizId);",
+									"    console.log(\"New Quiz ID saved!\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quizName\": \"A Quiz from Postman\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/quizzes",
+							"host": ["{{baseUrl}}"],
+							"path": ["quizzes"]
+						},
+						"description": "Creates a new quiz and automatically saves its ID to the `quizId` variable."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Quiz Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/quizzes/{{quizId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["quizzes", "{{quizId}}"]
+						},
+						"description": "Fetches a specific quiz (and its questions) using the `quizId` variable saved from the 'Create New Quiz' request."
+					},
+					"response": []
+				},
+				{
+					"name": "Add Question to Quiz",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"questionText\": \"What is the capital of Sweden?\",\n    \"answer\": \"Stockholm\",\n    \"latitude\": 59.3293,\n    \"longitude\": 18.0686\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/quizzes/{{quizId}}/questions",
+							"host": ["{{baseUrl}}"],
+							"path": ["quizzes", "{{quizId}}", "questions"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Quiz",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/quizzes/{{quizId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["quizzes", "{{quizId}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Leaderboard",
+			"item": [
+				{
+					"name": "Register Score",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"score\": 99\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/quizzes/{{quizId}}/scores",
+							"host": ["{{baseUrl}}"],
+							"path": ["quizzes", "{{quizId}}", "scores"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Leaderboard for Quiz",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/quizzes/{{quizId}}/leaderboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["quizzes", "{{quizId}}", "leaderboard"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://nx704vepz5.execute-api.eu-north-1.amazonaws.com",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "quizId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

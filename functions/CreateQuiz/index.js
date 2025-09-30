@@ -15,7 +15,6 @@ const baseHandler = async (event) => {
 	const createdAt = new Date().toISOString();
 
 	const quizItem = {
-		// According to our data model
 		pk: { S: `QUIZ#${quizId}` },
 		sk: { S: "METADATA" },
 		quizName: { S: quizName },

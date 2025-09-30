@@ -6,12 +6,11 @@ import httpErrorHandler from "@middy/http-error-handler";
 import createHttpError from "http-errors";
 
 const baseHandler = async (event) => {
-	// Get the quizId from the URL path (e.g., /quizzes/{quizId})
 	const { quizId } = event.pathParameters;
 
 	const params = {
 		TableName: "quiztopia",
-		// We query the main table using the Partition Key
+
 		KeyConditionExpression: "pk = :pk",
 		ExpressionAttributeValues: {
 			":pk": { S: `QUIZ#${quizId}` },
@@ -24,15 +23,12 @@ const baseHandler = async (event) => {
 		throw new createHttpError.NotFound("Quiz not found");
 	}
 
-	// Convert all returned items (quiz metadata + questions) to normal objects
 	const allItems = Items.map((item) => unmarshall(item));
 
-	// The first item will be the quiz metadata (where sk is 'METADATA')
 	const quizDetails = allItems.find((item) => item.sk === "METADATA");
-	// The rest will be the questions
+
 	const questions = allItems.filter((item) => item.sk.startsWith("QUESTION#"));
 
-	// Combine them into a clean response object
 	const response = {
 		...quizDetails,
 		questions: questions,

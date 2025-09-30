@@ -8,10 +8,8 @@ provider:
   region: eu-north-1
   environment:
     DYNAMODB_TABLE: "quiztopia"
-    JWT_SECRET: "secretKey" 
-
-
-
+    JWT_SECRET: "secretKey"
+  # --- Specific IAM policy for VG ---
   iam:
     role:
       statements:
@@ -21,6 +19,7 @@ provider:
             - "dynamodb:GetItem"
             - "dynamodb:Query"
             - "dynamodb:DeleteItem"
+            - "dynamodb:batchWriteItem"
           Resource:
             - "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/quiztopia"
             - "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/quiztopia/index/AllQuizzesIndex"
@@ -92,4 +91,3 @@ functions:
       - httpApi:
           path: /quizzes/{quizId}/leaderboard
           method: get
-

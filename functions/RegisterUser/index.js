@@ -1,5 +1,5 @@
 import { PutItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
-import { client } from "../../services/db.js"; // <-- Correctly importing your shared client
+import { client } from "../../services/db.js"; 
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import middy from "@middy/core";
